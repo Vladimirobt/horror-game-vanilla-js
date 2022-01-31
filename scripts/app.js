@@ -20,7 +20,7 @@ class Player {
 		this.isSneaking = false;
 		this.isRunning = false;
 
-		this.baseSpeed = 10;
+		this.baseSpeed = 3;
 
 		this.wireUpEvents();
 	}
@@ -64,7 +64,7 @@ class Player {
 		}
 	}
 
-	update() {
+	update(elapsedTime) {
 		let speedMultiplier = 1;
 
 		if (this.isRunning && !this.isSneaking) {
@@ -100,14 +100,42 @@ class Player {
 	}
 }
 
-let player = new Player();
+class Monster {
+	constructor() {
+		this.width = 32;
+		this.height = 32;
+		this.x = 0;
+		this.y = 0;
+		this.baseSpeed = 3;
+	}
+	update(elapsedTime) {}
 
-function gameLoop() {
+	render() {
+		ctx.save();
+		ctx.fillStyle = "red";
+		ctx.fillRect(this.x, this.y, this.width, this.height);
+		ctx.restore();
+	}
+}
+
+let player = new Player();
+let m1 = new Monster();
+
+let gameObjects = [player, m1];
+
+let currentTime = 0;
+
+function gameLoop(timeStamp) {
 	// clear off the canvas
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-	player.update();
-	player.render();
+	let elapsedTime = Math.floor(timeStamp - currentTime);
+	currentTime = timeStamp;
+
+	gameObjects.forEach((o) => {
+		o.update(elapsedTime);
+		o.render();
+	});
 
 	requestAnimationFrame(gameLoop);
 }
