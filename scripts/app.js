@@ -1,17 +1,20 @@
 //@ts-check
-/** @type {HTMLCanvasElement} */
-//@ts-ignore
-const canvas = document.getElementById("game-canvas");
-const ctx = canvas.getContext("2d");
-canvas.width = 800;
-canvas.height = 600;
+import { GameObject } from "./game-objects/game-object.js";
+import { canvas, ctx } from "./canvas.js";
 
-class Player {
-	constructor() {
-		this.width = 32;
-		this.height = 32;
+// /** @type {HTMLCanvasElement} */
+// //@ts-ignore
+// const canvas = document.getElementById("game-canvas");
+// const ctx = canvas.getContext("2d");
+// canvas.width = 800;
+// canvas.height = 600;
+
+class Player extends GameObject {
+	constructor(barriers) {
+		super(32, 32);
 		this.x = canvas.width / 2 - this.width / 2;
 		this.y = canvas.height / 2 - this.height / 2;
+		this.fillStyle = "green";
 
 		this.isMovingUp = false;
 		this.isMovingDown = false;
@@ -21,6 +24,7 @@ class Player {
 		this.isRunning = false;
 
 		this.baseSpeed = 3;
+		this.barriers = barriers;
 
 		this.wireUpEvents();
 	}
@@ -90,26 +94,47 @@ class Player {
 		if (this.isMovingLeft) {
 			this.x -= speed;
 		}
-	}
 
-	render() {
-		ctx.save();
-		ctx.fillStyle = "green";
-		ctx.fillRect(this.x, this.y, this.width, this.height);
-		ctx.restore();
+		if (this.x + this.width >= canvas.width) {
+			this.x = canvas.width - this.width;
+		}
+		if (this.x <= 0) {
+			this.x = 0;
+		}
+		if (this.y + this.height >= canvas.height) {
+			this.y = canvas.height - this.height;
+		}
+		if (this.y <= 0) {
+			this.y = 0;
+		}
+
+		this.barriers.forEach((b) => {
+			if (this.isColliding(b)) {
+				let bounds = b.getBounds();
+				if (player.isMovingDown) {
+					this.y = bounds.top - this.height;
+				} else if (player.isMovingUp) {
+					this.y = bounds.bottom;
+				}
+				if (player.isMovingRight) {
+					this.x = bounds.left - this.width;
+				} else if (player.isMovingLeft) {
+					this.x = bounds.right;
+				}
+			}
+		});
 	}
 }
 
-class Monster {
+class Monster extends GameObject {
 	constructor() {
-		this.width = 32;
-		this.height = 32;
-		this.x = 0;
-		this.y = 0;
+		super(32, 32);
+		this.fillStyle = "red";
 		this.baseSpeed = 3;
+
 		this.movement = {
 			timeSinceLastUpdate: 0,
-			timeToNextUpdate: 1000, //1000 millisecs = 1 sec
+			timeToNextUpdate: 1000, // 1000 milliseconds = 1 second
 			x: {
 				direction: 1,
 				speed: this.baseSpeed,
@@ -120,6 +145,7 @@ class Monster {
 			},
 		};
 	}
+
 	update(elapsedTime) {
 		this.movement.timeSinceLastUpdate += elapsedTime;
 		if (
@@ -134,36 +160,78 @@ class Monster {
 			this.movement.timeToNextUpdate = Math.random() * 1000 + 500;
 			this.movement.timeSinceLastUpdate = 0;
 		}
+
+		if (this.x + this.width >= canvas.width) {
+			this.movement.x.direction = -1;
+		}
+		if (this.x <= 0) {
+			this.movement.x.direction = 1;
+		}
+		if (this.y + this.height >= canvas.height) {
+			this.movement.y.direction = -1;
+		}
+		if (this.y <= 0) {
+			this.movement.y.direction = 1;
+		}
+
 		this.x += this.movement.x.speed * this.movement.x.direction;
 		this.y += this.movement.y.speed * this.movement.y.direction;
-		if(
-			this.x <= 0
-		) else(
-			this.movement.x.direction
-		)
-	}
-
-	render() {
-		ctx.save();
-		ctx.fillStyle = "red";
-		ctx.fillRect(this.x, this.y, this.width, this.height);
-		ctx.restore();
 	}
 }
+
+class Barrier extends GameObject {
+	constructor(x, y, w, h) {
+		super(w, h);
+		this.x = x;
+		this.y = y;
+		this.fillStyle = "black";
+	}
+}
+
+class Game {
+	/**
+	 * @param {(Barrier | Player | Monster)[]} gameObjects
+	 */
+	constructor(gameObjects) {
+		this.gameObjects = gameObjects;
+	}
+
+	checkForCollisions() {
+		this.gameObjects.forEach((o) => {
+			console.log(typeof o);
+		});
+	}
+}
+
+let b1 = new Barrier(600, 300, 32, 32 * 3);
+let barriers = [b1];
 
 let player = new Player();
 let m1 = new Monster();
 
-let gameObjects = [player, m1];
+let gameObjects = [player, m1, ...barriers];
+
+let game = new Game(gameObjects);
 
 let currentTime = 0;
+let lastMonsterAdded = 0;
+const monsterSpawnRate = 1000;
 
-function gameLoop(timeStamp) {
+function gameLoop(timestamp) {
+	//console.log(timestamp);
 	// clear off the canvas
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-	let elapsedTime = Math.floor(timeStamp - currentTime);
-	currentTime = timeStamp;
+	let elapsedTime = Math.floor(timestamp - currentTime);
+	currentTime = timestamp;
+
+	// lastMonsterAdded += elapsedTime;
+	// if (lastMonsterAdded >= monsterSpawnRate) {
+	// 	gameObjects.push(new Monster());
+	// 	lastMonsterAdded = 0;
+	// }
+
+	game.checkForCollisions();
 
 	gameObjects.forEach((o) => {
 		o.update(elapsedTime);
