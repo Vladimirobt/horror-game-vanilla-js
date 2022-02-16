@@ -3,15 +3,19 @@
 import { ctx } from "../canvas.js";
 
 export class GameObject {
-	constructor(w, h) {
-		this.x = 0;
-		this.y = 0;
+	constructor(w, h, x, y) {
+		this.x = x;
+		this.y = y;
 		this.width = w;
 		this.height = h;
 		this.fillStyle = "";
+		this.lastLocation = new Location(this.x, this.y);
 	}
 
-	update(elapsedTime) {}
+	update(elapsedTime) {
+		this.lastLocation.x = this.x;
+		this.lastLocation.y = this.y;
+	}
 	render() {
 		ctx.save();
 		ctx.fillStyle = this.fillStyle;
@@ -30,11 +34,12 @@ export class GameObject {
 		let myBounds = this.getBounds();
 		let oBounds = o.getBounds();
 
-		if (myBounds.bottom <= oBounds.top) return false;
-		if (myBounds.top >= oBounds.bottom) return false;
-		if (myBounds.right <= oBounds.left) return false;
-		if (myBounds.left >= oBounds.right) return false;
-		return true;
+		if (myBounds.bottom <= oBounds.top) return undefined;
+		if (myBounds.top >= oBounds.bottom) return undefined;
+		if (myBounds.right <= oBounds.left) return undefined;
+		if (myBounds.left >= oBounds.right) return undefined;
+
+		return this.lastLocation;
 	}
 }
 
@@ -44,5 +49,12 @@ class ObjectBounds {
 		this.bottom = y + h;
 		this.left = x;
 		this.right = x + w;
+	}
+}
+
+export class Location {
+	constructor(x, y) {
+		this.x = x;
+		this.y = y;
 	}
 }
