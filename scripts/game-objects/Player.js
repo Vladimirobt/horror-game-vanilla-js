@@ -1,9 +1,15 @@
 //@ts-check
 import { GameObject, Location } from "./game-object.js";
 import { canvas, ctx } from "../canvas.js";
+import { Game } from "./Game.js";
 
 export class Player extends GameObject {
-	constructor(barriers, x, y) {
+	/**
+	 * @param {Game} game
+	 * @param {number} x
+	 * @param {number} y
+	 */
+	constructor(game, x, y) {
 		super(32, 32, x, y);
 		this.fillStyle = "green";
 
@@ -16,7 +22,8 @@ export class Player extends GameObject {
 		this.isSmall = false;
 
 		this.baseSpeed = 3;
-		this.barriers = barriers;
+		this.game = game;
+		this.inventory = [];
 
 		this.wireUpEvents();
 	}
@@ -113,13 +120,37 @@ export class Player extends GameObject {
 			this.y = 0;
 		}
 
-		this.barriers.forEach((b) => {
+		this.game.barriers.forEach((b) => {
+			if (b.isOpen) return;
+
 			let safeLocation = this.isColliding(b);
+
+			if (safeLocation && b.isLocked && this.inventory.length) {
+				this.inventory.pop();
+				b.isLocked = false;
+				b.isOpen = true;
+				return;
+			}
+
 			if (safeLocation) {
 				this.x = safeLocation.x;
 				this.y = safeLocation.y;
 			}
 		});
+
+		if (this.isColliding(this.game.exit)) {
+			this.game.playerWin = true;
+			console.log;
+		}
+
+		this.game.keys
+			.filter((k) => !k.isPickedUp)
+			.forEach((k) => {
+				if (this.isColliding(k)) {
+					this.inventory.push(k);
+					k.isPickedUp = true;
+				}
+			});
 
 		super.update(elapsedTime);
 	}

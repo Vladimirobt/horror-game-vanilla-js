@@ -11,13 +11,21 @@ import { level1 } from "./levels.js";
 // canvas.height = 600;
 
 let game = new Game();
+game.start();
 
-let { player, monster, barriers, keys } = game.loadLevel(level1);
-let gameObjects = [player, ...monster, ...barriers, ...keys];
+game.loadLevel(level1);
+
 let currentTime = 0;
 
 function gameLoop(timestamp) {
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
+	let gameObjects = [
+		game.player,
+		...game.monsters,
+		...game.barriers,
+		...game.keys,
+		game.exit,
+	];
 
 	let elapsedTime = Math.floor(timestamp - currentTime);
 	currentTime = timestamp;
@@ -27,7 +35,20 @@ function gameLoop(timestamp) {
 		o.render();
 	});
 
-	requestAnimationFrame(gameLoop);
+	if (!game.isPlayerDead && !game.playerWin) {
+		requestAnimationFrame(gameLoop);
+	}
+
+	if (game.playerWin) {
+		alert("Nice you won. :)");
+	}
+	if (game.isPlayerDead) {
+		if (confirm("you lost. Try again?")) {
+			return;
+		} else {
+			return;
+		}
+	}
 }
 
 requestAnimationFrame(gameLoop);

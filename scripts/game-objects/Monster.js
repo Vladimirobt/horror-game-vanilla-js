@@ -1,15 +1,21 @@
 //@ts-check
 import { GameObject, Location } from "./game-object.js";
+import { Game } from "./Game.js";
 
 export class Monster extends GameObject {
-	constructor(barriers, x, y) {
+	/**
+	 * @param {Game} game
+	 * @param {any} x
+	 * @param {any} y
+	 */
+	constructor(game, x, y) {
 		super(32, 32, x, y);
 		this.fillStyle = "red";
 		this.baseSpeed = 3;
 
 		this.isLastMoveColliding = false;
 
-		this.barriers = barriers;
+		this.game = game;
 
 		this.movement = {
 			timeSinceLastUpdate: 0,
@@ -35,7 +41,6 @@ export class Monster extends GameObject {
 			this.movement.x.direction = Math.random() >= 0.5 ? 1 : -1;
 			this.movement.y.direction = Math.random() >= 0.5 ? 1 : -1;
 
-			this.movement.x.speed = Math.random() * this.baseSpeed;
 			this.movement.y.speed = Math.random() * this.baseSpeed;
 
 			this.movement.timeToNextUpdate = Math.random() * 1000 + 500;
@@ -46,7 +51,9 @@ export class Monster extends GameObject {
 		this.y += this.movement.y.speed * this.movement.y.direction;
 
 		this.isLastMoveColliding = false;
-		this.barriers.forEach((b) => {
+		this.game.barriers.forEach((b) => {
+			if (b.isOpen) return;
+
 			let safeLocation = this.isColliding(b);
 			if (safeLocation) {
 				this.isLastMoveColliding = true;
@@ -54,6 +61,10 @@ export class Monster extends GameObject {
 				this.y = safeLocation.y;
 			}
 		});
+
+		if (this.isColliding(this.game.player)) {
+			this.game.isPlayerDead = true;
+		}
 
 		super.update(elapsedTime);
 	}

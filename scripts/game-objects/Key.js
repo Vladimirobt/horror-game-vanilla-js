@@ -8,4 +8,9 @@ export class key extends GameObject {
 		this.fillStyle = "gold";
 		this.isPickedUp = false;
 	}
+
+	render() {
+		if (this.isPickedUp) return;
+		super.render();
+	}
 }
