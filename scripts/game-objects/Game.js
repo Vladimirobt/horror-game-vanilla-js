@@ -13,7 +13,7 @@ export class Game {
 		this.barriers = [];
 		this.monsters = [];
 		this.keys = [];
-		this.exit = undefined;
+		this.exit = [];
 
 		this.isPlayerDead = false;
 		this.playerWin = false;
@@ -57,7 +57,7 @@ export class Game {
 						this.barriers.push(new Door(x, y, false));
 						break;
 					case "x":
-						this.exit = new Exit(x, y);
+						this.exit.push(new Exit(x, y));
 						break;
 				}
 			}

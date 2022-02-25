@@ -138,10 +138,11 @@ export class Player extends GameObject {
 			}
 		});
 
-		if (this.isColliding(this.game.exit)) {
-			this.game.playerWin = true;
-			console.log;
-		}
+		this.game.exit.forEach((e) => {
+			if (this.isColliding(e)) {
+				this.game.playerWin = true;
+			}
+		});
 
 		this.game.keys
 			.filter((k) => !k.isPickedUp)

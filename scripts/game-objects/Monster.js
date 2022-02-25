@@ -11,7 +11,7 @@ export class Monster extends GameObject {
 	constructor(game, x, y) {
 		super(32, 32, x, y);
 		this.fillStyle = "red";
-		this.baseSpeed = 3;
+		this.baseSpeed = 2;
 
 		this.isLastMoveColliding = false;
 

@@ -1,6 +1,7 @@
 //@ts-check
 import { canvas, ctx } from "./canvas.js";
 import { Game } from "./game-objects/Game.js";
+import { Player } from "./game-objects/Player.js";
 import { level1 } from "./levels.js";
 
 // /** @type {HTMLCanvasElement} */
@@ -24,7 +25,7 @@ function gameLoop(timestamp) {
 		...game.monsters,
 		...game.barriers,
 		...game.keys,
-		game.exit,
+		...game.exit,
 	];
 
 	let elapsedTime = Math.floor(timestamp - currentTime);
@@ -40,11 +41,17 @@ function gameLoop(timestamp) {
 	}
 
 	if (game.playerWin) {
-		alert("Nice you won. :)");
+		if (confirm("Nice you won. Go to next level?")) {
+			game.currentLevel + 1;
+			game.playerWin = false;
+			requestAnimationFrame(gameLoop);
+		} else {
+			return;
+		}
 	}
 	if (game.isPlayerDead) {
 		if (confirm("you lost. Try again?")) {
-			return;
+			window.location.reload();
 		} else {
 			return;
 		}
