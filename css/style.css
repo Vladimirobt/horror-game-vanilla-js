@@ -18,3 +18,19 @@ body {
 	height: 848px;
 	border: solid 1px black;
 }
+
+#retryGame {
+	position: absolute;
+	top: 63px;
+	height: 32px;
+	width: 100px;
+	left: 0.3%;
+}
+
+#retryLevel {
+	position: absolute;
+	top: 97px;
+	height: 32px;
+	width: 100px;
+	left: 0.3%;
+}

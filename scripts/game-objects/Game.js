@@ -5,7 +5,8 @@ import { Player } from "./Player.js";
 import { key } from "./Key.js";
 import { Door } from "./door.js";
 import { Exit } from "./exit.js";
-import { level1, level2 } from "../levels.js";
+import { level1, level2, Level3 } from "../levels.js";
+import { canvas, ctx } from "../canvas.js";
 
 export class Game {
 	constructor() {
@@ -14,22 +15,36 @@ export class Game {
 		this.monsters = [];
 		this.keys = [];
 		this.exit = [];
+		this.gameObjects = [];
 
 		this.isPlayerDead = false;
 		this.playerWin = false;
 
-		this.levels = [level1, level2];
+		this.levels = [level1, level2, Level3];
 		this.currentLevel = 0;
+		this.currentTime = 0;
 	}
 
 	start() {
-		this.loadLevel(this.levels[this.currentLevel]);
+		this.loadLevel();
+		requestAnimationFrame(gameLoop);
 	}
 
-	/**
-	 * @param {string[]} level
-	 */
-	loadLevel(level) {
+	nextLevel() {
+		this.currentLevel++;
+		this.player = undefined;
+		this.barriers = [];
+		this.monsters = [];
+		this.keys = [];
+		this.exit = [];
+		this.gameObjects = [];
+
+		this.playerWin = false;
+		this.loadLevel();
+	}
+
+	loadLevel() {
+		let level = this.levels[this.currentLevel];
 		let monsterCoords = [];
 		let playerCoords = { x: 0, y: 0 };
 
@@ -68,11 +83,34 @@ export class Game {
 		});
 
 		this.player = new Player(this, playerCoords.x, playerCoords.y);
-		return {
-			player: this.player,
-			monster: this.monsters,
-			barriers: this.barriers,
-			keys: this.keys,
-		};
+		this.gameObjects = [
+			game.player,
+			...game.monsters,
+			...game.barriers,
+			...game.keys,
+			...game.exit,
+		];
 	}
+}
+
+export let game = new Game();
+
+function gameLoop(timestamp) {
+	ctx.clearRect(0, 0, canvas.width, canvas.height);
+	if (game.playerWin) {
+		alert("You beat this level.");
+		game.nextLevel();
+	}
+	if (game.isPlayerDead) {
+		alert("You died");
+		return;
+	}
+	let elapsedTime = Math.floor(timestamp - game.currentTime);
+	game.currentTime = timestamp;
+
+	game.gameObjects.forEach((o) => {
+		o.update(elapsedTime);
+		o.render();
+	});
+	requestAnimationFrame(gameLoop);
 }
