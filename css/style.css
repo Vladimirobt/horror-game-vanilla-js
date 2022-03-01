@@ -29,19 +29,3 @@ body {
 	font-family: zombiecontrol3d;
 	src: url("/fonts/zombie-control/zombiecontrol3d.ttf");
 }
-
-#retryGame {
-	position: absolute;
-	top: 63px;
-	height: 32px;
-	width: 100px;
-	left: 0.3%;
-}
-
-#retryLevel {
-	position: absolute;
-	top: 97px;
-	height: 32px;
-	width: 100px;
-	left: 0.3%;
-}

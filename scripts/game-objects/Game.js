@@ -8,6 +8,7 @@ import { Exit } from "./exit.js";
 import { level1, level2, Level3 } from "../levels.js";
 import { canvas, ctx } from "../canvas.js";
 import { StartScene } from "../scenes/start.js";
+import { LoseScene } from "../scenes/lose.js";
 
 export class Game {
 	constructor() {
@@ -34,6 +35,11 @@ export class Game {
 
 	start() {
 		this.loadLevel();
+	}
+
+	lose() {
+		let lose = new LoseScene(this);
+		this.gameObjects = [lose];
 	}
 
 	nextLevel() {
@@ -121,8 +127,7 @@ function gameLoop(timestamp) {
 		game.nextLevel();
 	}
 	if (game.isPlayerDead) {
-		alert("You died");
-		game.resetLevel();
+		game.lose();
 	}
 	let elapsedTime = Math.floor(timestamp - game.currentTime);
 	game.currentTime = timestamp;
