@@ -1,7 +1,7 @@
 //@ts-check
 import { GameObject, Location } from "./game-object.js";
 import { canvas, ctx } from "../canvas.js";
-import { Game } from "./Game.js";
+import { Game } from "./game.js";
 
 export class Player extends GameObject {
 	/**

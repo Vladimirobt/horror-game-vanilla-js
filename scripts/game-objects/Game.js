@@ -7,6 +7,7 @@ import { Door } from "./door.js";
 import { Exit } from "./exit.js";
 import { level1, level2, Level3 } from "../levels.js";
 import { canvas, ctx } from "../canvas.js";
+import { StartScene } from "../scenes/start.js";
 
 export class Game {
 	constructor() {
@@ -25,9 +26,14 @@ export class Game {
 		this.currentTime = 0;
 	}
 
+	init() {
+		let start = new StartScene(this);
+		this.gameObjects.push(start);
+		requestAnimationFrame(gameLoop);
+	}
+
 	start() {
 		this.loadLevel();
-		requestAnimationFrame(gameLoop);
 	}
 
 	nextLevel() {
@@ -40,6 +46,19 @@ export class Game {
 		this.gameObjects = [];
 
 		this.playerWin = false;
+		this.loadLevel();
+	}
+
+	resetLevel() {
+		this.player = undefined;
+		this.barriers = [];
+		this.monsters = [];
+		this.keys = [];
+		this.exit = [];
+		this.gameObjects = [];
+
+		this.playerWin = false;
+		this.isPlayerDead = false;
 		this.loadLevel();
 	}
 
@@ -103,7 +122,7 @@ function gameLoop(timestamp) {
 	}
 	if (game.isPlayerDead) {
 		alert("You died");
-		return;
+		game.resetLevel();
 	}
 	let elapsedTime = Math.floor(timestamp - game.currentTime);
 	game.currentTime = timestamp;

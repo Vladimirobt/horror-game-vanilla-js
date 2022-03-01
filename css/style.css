@@ -11,12 +11,23 @@ body {
 	flex-direction: column;
 	justify-content: center;
 	align-items: center;
+	font-family: zombiecontrol;
 }
 
 #game-canvas {
 	width: 1696px;
 	height: 848px;
 	border: solid 1px black;
+}
+
+@font-face {
+	font-family: zombiecontrol;
+	src: url("/fonts/zombie-control/zombiecontrol.ttf");
+}
+
+@font-face {
+	font-family: zombiecontrol3d;
+	src: url("/fonts/zombie-control/zombiecontrol3d.ttf");
 }
 
 #retryGame {

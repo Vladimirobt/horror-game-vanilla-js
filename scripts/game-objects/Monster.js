@@ -1,6 +1,6 @@
 //@ts-check
 import { GameObject, Location } from "./game-object.js";
-import { Game } from "./Game.js";
+import { Game } from "./game.js";
 
 export class Monster extends GameObject {
 	/**
