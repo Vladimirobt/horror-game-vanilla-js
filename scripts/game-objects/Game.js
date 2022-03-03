@@ -9,6 +9,8 @@ import { level1, level2, Level3 } from "../levels.js";
 import { canvas, ctx } from "../canvas.js";
 import { StartScene } from "../scenes/start.js";
 import { LoseScene } from "../scenes/lose.js";
+import { WinScene } from "../scenes/win.js";
+import { AudioPlayer } from "../../audia-player.js";
 
 export class Game {
 	constructor() {
@@ -25,6 +27,8 @@ export class Game {
 		this.levels = [level1, level2, Level3];
 		this.currentLevel = 0;
 		this.currentTime = 0;
+
+		this.audioPlayer = new AudioPlayer();
 	}
 
 	init() {
@@ -33,39 +37,53 @@ export class Game {
 		requestAnimationFrame(gameLoop);
 	}
 
+	resetGame() {
+		this.player = undefined;
+		this.barriers = [];
+		this.monsters = [];
+		this.keys = [];
+		this.exit = [];
+		this.gameObjects = [];
+		this.isPlayerDead = false;
+		this.playerWin = false;
+	}
+
 	start() {
+		this.audioPlayer.init();
+		this.audioPlayer.playMusic();
+		this.currentLevel = 0;
 		this.loadLevel();
 	}
 
+	restart() {
+		this.resetGame();
+		this.start();
+	}
+
 	lose() {
+		this.audioPlayer.deathScream();
+		this.resetGame();
 		let lose = new LoseScene(this);
 		this.gameObjects = [lose];
 	}
 
-	nextLevel() {
-		this.currentLevel++;
-		this.player = undefined;
-		this.barriers = [];
-		this.monsters = [];
-		this.keys = [];
-		this.exit = [];
-		this.gameObjects = [];
-
-		this.playerWin = false;
-		this.loadLevel();
+	win() {
+		this.audioPlayer.winSound();
+		this.resetGame();
+		let win = new WinScene(this);
+		this.gameObjects = [win];
 	}
 
-	resetLevel() {
-		this.player = undefined;
-		this.barriers = [];
-		this.monsters = [];
-		this.keys = [];
-		this.exit = [];
-		this.gameObjects = [];
+	nextLevel() {
+		this.resetGame();
+		this.currentLevel++;
 
-		this.playerWin = false;
-		this.isPlayerDead = false;
-		this.loadLevel();
+		if (this.currentLevel < this.levels.length) {
+			this.audioPlayer.teleport();
+			this.loadLevel();
+		} else {
+			this.win();
+		}
 	}
 
 	loadLevel() {
@@ -123,8 +141,7 @@ export let game = new Game();
 function gameLoop(timestamp) {
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
 	if (game.playerWin) {
-		alert("You beat this level.");
-		game.nextLevel();
+		game.win();
 	}
 	if (game.isPlayerDead) {
 		game.lose();

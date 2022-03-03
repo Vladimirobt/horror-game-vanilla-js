@@ -129,6 +129,7 @@ export class Player extends GameObject {
 				this.inventory.pop();
 				b.isLocked = false;
 				b.isOpen = true;
+				this.game.audioPlayer.doorOpen();
 				return;
 			}
 
@@ -148,6 +149,7 @@ export class Player extends GameObject {
 			.filter((k) => !k.isPickedUp)
 			.forEach((k) => {
 				if (this.isColliding(k)) {
+					this.game.audioPlayer.keyPickup();
 					this.inventory.push(k);
 					k.isPickedUp = true;
 				}
