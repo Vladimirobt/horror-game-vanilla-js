@@ -11,6 +11,7 @@ export class LoseScene extends GameObject {
 	 */
 	constructor(game) {
 		super(canvas.width, canvas.height, 0, 0);
+		game.audioPlayer.deathScream();
 		this.fillStyle = ctx.createLinearGradient(0, 0, 0, canvas.height);
 		this.fillStyle.addColorStop(0.5, "black");
 		this.fillStyle.addColorStop(1, "orange");

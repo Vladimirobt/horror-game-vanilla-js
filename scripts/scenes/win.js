@@ -51,7 +51,7 @@ export class WinScene extends GameObject {
 
 		ctx.font = "80px zombiecontrol";
 		ctx.fillText(
-			"Click to play again",
+			"Click to go to the next level",
 			canvas.width / 2,
 			canvas.height - 60
 		);

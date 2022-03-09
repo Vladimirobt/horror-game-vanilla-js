@@ -63,7 +63,7 @@ export class AudioPlayer {
 	}
 
 	deathScream() {
-		deathScream.volume = 0.05;
+		deathScream.volume = 0.1;
 		deathScream.play();
 	}
 
